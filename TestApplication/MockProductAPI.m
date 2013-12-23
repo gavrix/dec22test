@@ -85,4 +85,43 @@
 }
 
 
+#pragma mark - ReactiveCocoa support
+
+- (RACSignal *)productsAtPage:(NSUInteger)pageIndex
+					 pageSize:(NSUInteger)pageSize {
+	return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+		[self productsAtPage:pageIndex
+					pageSize:pageSize
+		 withCompletionBlock:^(id<ProductsResponse> response, NSError *error) {
+			 if (error) {
+				 [subscriber sendError:error];
+			 }
+			 else {
+				 [subscriber sendNext:response];
+				 [subscriber sendCompleted];
+			 }
+		 }];
+		return nil;// for now this signal is not cancellable
+	}];
+}
+
+- (RACSignal *)productsAtRange:(NSRange)range {
+	return [RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
+		
+		[self productsAtRange:range
+		  withCompletionBlock:^(id<ProductsResponse> response, NSError *error) {
+			  if (error) {
+				  [subscriber sendError:error];
+			  }
+			  else {
+				  [subscriber sendNext:response];
+				  [subscriber sendCompleted];
+			  }
+		  }];
+		
+		return nil;
+	}];
+}
+
+
 @end

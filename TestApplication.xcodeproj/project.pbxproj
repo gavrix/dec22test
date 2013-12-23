@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03041AC239E44788A3D0D1DB /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 86943C9AB9C44F518F5A53ED /* libPods.a */; };
 		3D02C28B1861E0FD00131CE4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D02C28A1861E0FD00131CE4 /* Foundation.framework */; };
 		3D02C28D1861E0FD00131CE4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D02C28C1861E0FD00131CE4 /* CoreGraphics.framework */; };
 		3D02C28F1861E0FD00131CE4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D02C28E1861E0FD00131CE4 /* UIKit.framework */; };
@@ -24,6 +25,8 @@
 		3D02C2B91861E0FD00131CE4 /* TestApplicationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D02C2B81861E0FD00131CE4 /* TestApplicationTests.m */; };
 		3D02C2C71861E19300131CE4 /* MockProductAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D02C2C61861E19300131CE4 /* MockProductAPI.m */; };
 		3D02C2CD1861E2CB00131CE4 /* MockProductsResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D02C2CC1861E2CB00131CE4 /* MockProductsResponse.m */; };
+		742AD74C1867B86F00DD521E /* RACIndexSetSequence.m in Sources */ = {isa = PBXBuildFile; fileRef = 742AD74B1867B86F00DD521E /* RACIndexSetSequence.m */; };
+		742AD74F1867B87D00DD521E /* NSIndexSet+RACSequenceAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 742AD74E1867B87D00DD521E /* NSIndexSet+RACSequenceAdditions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +65,12 @@
 		3D02C2C61861E19300131CE4 /* MockProductAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MockProductAPI.m; sourceTree = "<group>"; };
 		3D02C2CB1861E2CB00131CE4 /* MockProductsResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MockProductsResponse.h; sourceTree = "<group>"; };
 		3D02C2CC1861E2CB00131CE4 /* MockProductsResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MockProductsResponse.m; sourceTree = "<group>"; };
+		742AD74A1867B86F00DD521E /* RACIndexSetSequence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RACIndexSetSequence.h; sourceTree = "<group>"; };
+		742AD74B1867B86F00DD521E /* RACIndexSetSequence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RACIndexSetSequence.m; sourceTree = "<group>"; };
+		742AD74D1867B87D00DD521E /* NSIndexSet+RACSequenceAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexSet+RACSequenceAdditions.h"; sourceTree = "<group>"; };
+		742AD74E1867B87D00DD521E /* NSIndexSet+RACSequenceAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSIndexSet+RACSequenceAdditions.m"; sourceTree = "<group>"; };
+		86943C9AB9C44F518F5A53ED /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		E2FA94E9B55345869D7A525D /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +81,7 @@
 				3D02C28D1861E0FD00131CE4 /* CoreGraphics.framework in Frameworks */,
 				3D02C28F1861E0FD00131CE4 /* UIKit.framework in Frameworks */,
 				3D02C28B1861E0FD00131CE4 /* Foundation.framework in Frameworks */,
+				03041AC239E44788A3D0D1DB /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,6 +105,7 @@
 				3D02C2B21861E0FD00131CE4 /* TestApplicationTests */,
 				3D02C2891861E0FD00131CE4 /* Frameworks */,
 				3D02C2881861E0FD00131CE4 /* Products */,
+				E2FA94E9B55345869D7A525D /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -114,6 +125,7 @@
 				3D02C28C1861E0FD00131CE4 /* CoreGraphics.framework */,
 				3D02C28E1861E0FD00131CE4 /* UIKit.framework */,
 				3D02C2AC1861E0FD00131CE4 /* XCTest.framework */,
+				86943C9AB9C44F518F5A53ED /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -121,6 +133,7 @@
 		3D02C2901861E0FD00131CE4 /* TestApplication */ = {
 			isa = PBXGroup;
 			children = (
+				742AD7501867D7CF00DD521E /* ReactiveCocoa additions */,
 				3D02C2C21861E11300131CE4 /* API */,
 				3D02C2991861E0FD00131CE4 /* AppDelegate.h */,
 				3D02C29A1861E0FD00131CE4 /* AppDelegate.m */,
@@ -183,6 +196,17 @@
 			name = Impl;
 			sourceTree = "<group>";
 		};
+		742AD7501867D7CF00DD521E /* ReactiveCocoa additions */ = {
+			isa = PBXGroup;
+			children = (
+				742AD74D1867B87D00DD521E /* NSIndexSet+RACSequenceAdditions.h */,
+				742AD74E1867B87D00DD521E /* NSIndexSet+RACSequenceAdditions.m */,
+				742AD74A1867B86F00DD521E /* RACIndexSetSequence.h */,
+				742AD74B1867B86F00DD521E /* RACIndexSetSequence.m */,
+			);
+			name = "ReactiveCocoa additions";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -190,9 +214,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3D02C2BC1861E0FD00131CE4 /* Build configuration list for PBXNativeTarget "TestApplication" */;
 			buildPhases = (
+				7ED8C3A7813A44FF8B08101D /* Check Pods Manifest.lock */,
 				3D02C2831861E0FD00131CE4 /* Sources */,
 				3D02C2841861E0FD00131CE4 /* Frameworks */,
 				3D02C2851861E0FD00131CE4 /* Resources */,
+				E6BDAF625F0E4D1BA69D7B96 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -276,6 +302,39 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		7ED8C3A7813A44FF8B08101D /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		E6BDAF625F0E4D1BA69D7B96 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		3D02C2831861E0FD00131CE4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -284,8 +343,10 @@
 				3D02C2C71861E19300131CE4 /* MockProductAPI.m in Sources */,
 				3D02C2A41861E0FD00131CE4 /* ViewController.m in Sources */,
 				3D02C29B1861E0FD00131CE4 /* AppDelegate.m in Sources */,
+				742AD74C1867B86F00DD521E /* RACIndexSetSequence.m in Sources */,
 				3D02C2CD1861E2CB00131CE4 /* MockProductsResponse.m in Sources */,
 				3D02C2971861E0FD00131CE4 /* main.m in Sources */,
+				742AD74F1867B87D00DD521E /* NSIndexSet+RACSequenceAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,6 +480,7 @@
 		};
 		3D02C2BD1861E0FD00131CE4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E2FA94E9B55345869D7A525D /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -432,6 +494,7 @@
 		};
 		3D02C2BE1861E0FD00131CE4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E2FA94E9B55345869D7A525D /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -504,6 +567,7 @@
 				3D02C2BE1861E0FD00131CE4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3D02C2BF1861E0FD00131CE4 /* Build configuration list for PBXNativeTarget "TestApplicationTests" */ = {
 			isa = XCConfigurationList;
@@ -512,6 +576,7 @@
 				3D02C2C11861E0FD00131CE4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

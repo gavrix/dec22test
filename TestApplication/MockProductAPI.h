@@ -7,10 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <ReactiveCocoa.h>
 
 #import "ProductsAPI.h"
 
 @interface MockProductAPI : NSObject<ProductsAPI>
 
 + (instancetype)sharedInstance;
+
+- (RACSignal *)productsAtPage:(NSUInteger)pageIndex
+					 pageSize:(NSUInteger)pageSize;
+
+- (RACSignal *)productsAtRange:(NSRange)range;
+
 @end

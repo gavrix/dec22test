@@ -10,6 +10,12 @@
 #import "MockProductAPI.h"
 #import "ProductsAPI.h"
 
+#import <libextobjc/extobjc.h>
+
+//rac custom additions
+
+#import "NSIndexSet+RACSequenceAdditions.h"
+
 // this value is measured so that one pgae filled with items fits the screen.
 // It is supposed to be different for 3.5" and 10"screens
 const NSUInteger ViewControllerProductsPageSize = 13;
@@ -17,11 +23,11 @@ const NSUInteger ViewControllerScrollViewAtBottomThreshold = 5;
 
 @interface ViewController ()
 {
-	NSMutableArray *_loadedItems;
-	struct {
-		unsigned int ItemsLoadingTriggered:1;
-	} _flags;
+	RACCommand *_loadNextPageCommand;
 }
+
+@property (nonatomic) NSArray *loadedItems;
+@property (nonatomic) NSNumber *loading;
 @end
 
 @implementation ViewController
@@ -32,7 +38,13 @@ const NSUInteger ViewControllerScrollViewAtBottomThreshold = 5;
 // to prevent overriding possible method in one of it's superclasses implementations, as they may follow
 // same pattern.
 - (void)_commonViewControllerInit {
-	_loadedItems = [[NSMutableArray alloc] init];
+	self.loadedItems = @[];
+	
+	_loadNextPageCommand = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(NSNumber *pageIndexNumber) {
+
+		return [[MockProductAPI sharedInstance] productsAtPage:pageIndexNumber.unsignedIntegerValue
+													  pageSize:ViewControllerProductsPageSize];
+	}];
 }
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -56,44 +68,85 @@ const NSUInteger ViewControllerScrollViewAtBottomThreshold = 5;
 - (void)viewDidLoad {
     [super viewDidLoad];
 	
-	[self _loadNextPage];
+	[self _setupLoadingIndicatorRelations];
+	[self _setupItemsLoadedRelations];
+	
+	
+	[_loadNextPageCommand execute:@(self.loadedItems.count)];
 }
 
-#pragma mark - Private helper methods
-- (void)_appendLoadedItems:(NSArray *)items {
+#pragma mark - Reactive declarations
 
-	NSMutableArray *indexPaths = [NSMutableArray array];
-	for (unsigned i = 0; i< items.count; ++i) {
-		[indexPaths addObject:[NSIndexPath indexPathForRow:i + _loadedItems.count inSection:0]];
-	}
-	[_loadedItems addObjectsFromArray:items];
-	[self.tableView insertRowsAtIndexPaths:indexPaths
-						  withRowAnimation:UITableViewRowAnimationNone];
-
+- (void)_setupItemsLoadedRelations {
+	@weakify(self)
+	RACSignal *nextItemsLoadedSignal = [[[_loadNextPageCommand executionSignals] flatten] map:^id(id<ProductsResponse> response) {
+		return [response items];
+	}];
+	
+	RAC(self, loadedItems) = [nextItemsLoadedSignal map:^id(NSArray *value) {
+		@strongify(self);
+		return [self.loadedItems arrayByAddingObjectsFromArray:value];
+	}];
+	
+	[[[[[_loadNextPageCommand executionSignals] flattenMap:^RACStream *(RACSignal *executionSignal) {
+		return [executionSignal takeLast:1];
+	}] map:^id(id<ProductsResponse> response) {
+		return response.items;
+	}] map:^id(NSArray *items) {
+		@strongify(self);
+		NSIndexSet *itemsIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.loadedItems.count - items.count, items.count)];
+		
+		return [[itemsIndexes.rac_sequence map:^id(NSNumber *idx) {
+			return [NSIndexPath indexPathForRow:idx.unsignedIntegerValue inSection:0];
+		}] array];
+	}] subscribeNext:^(NSArray *indexPaths) {
+		@strongify(self);
+		[self.tableView beginUpdates];
+		
+		[self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.tableView numberOfRowsInSection:0] - 1 inSection:0]]
+							  withRowAnimation:UITableViewRowAnimationFade];
+		[self.tableView insertRowsAtIndexPaths:indexPaths
+							  withRowAnimation:UITableViewRowAnimationNone];
+		
+		[self.tableView endUpdates];
+	}];
+	
 }
 
-- (void)_loadNextPage {
-	_flags.ItemsLoadingTriggered = YES;
-	[_loadedItems addObject:@"Loading"];
-	[self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_loadedItems.count - 1 inSection:0]]
-						  withRowAnimation:UITableViewRowAnimationFade];
+- (void)_setupLoadingIndicatorRelations {
+	RACSignal *fadeValueSignal = [RACSignal return: @(UITableViewRowAnimationFade)];
+	
+	RACSignal *loadingStartedSignal = [[_loadNextPageCommand executionSignals] map:^id(id value) {
+		return @(YES);
+	}];
+	
+	RACSignal *loadingFinishedSignal = [_loadNextPageCommand.executionSignals flattenMap:^RACStream *(RACSignal *subscribeSignal) {
+		return [[[subscribeSignal materialize] filter:^BOOL(RACEvent *event) {
+			return event.eventType == RACEventTypeCompleted;
+		}] map:^id(id value) {
+			return @(NO);
+		}];
+	}];
+	
+	RACSignal *loadingErrorSignal = [_loadNextPageCommand.errors map:^id(id value) {
+		return @(NO);
+	}];
+	
+	RAC(self, loading) = [RACSignal merge:@[loadingStartedSignal, loadingFinishedSignal, loadingErrorSignal]];
+	
+	@weakify(self);
+	[self.tableView rac_liftSelector:@selector(insertRowsAtIndexPaths:withRowAnimation:)
+						 withSignals:[loadingStartedSignal map:^id(id value) {
+		@strongify(self);
+		return @[[NSIndexPath indexPathForRow:[self.tableView numberOfRowsInSection:0] inSection:0]];
+	}], fadeValueSignal, nil];
+	
+	[self.tableView rac_liftSelector:@selector(deleteRowsAtIndexPaths:withRowAnimation:)
+						 withSignals:[loadingErrorSignal map:^id(id value) {
+		@strongify(self);
+		return @[[NSIndexPath indexPathForRow:[self.tableView numberOfRowsInSection:0] - 1 inSection:0]];
+	}], fadeValueSignal, nil];
 
-	[[MockProductAPI sharedInstance] productsAtPage:_loadedItems.count / ViewControllerProductsPageSize
-										   pageSize:ViewControllerProductsPageSize
-								withCompletionBlock:^(id<ProductsResponse> response, NSError *error) {
-									_flags.ItemsLoadingTriggered = NO;
-									
-									[self.tableView beginUpdates];
-									
-									[_loadedItems removeLastObject];
-									[self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:_loadedItems.count inSection:0]]
-														  withRowAnimation:UITableViewRowAnimationFade];
-									[self _appendLoadedItems:[response items]];
-									
-									[self.tableView endUpdates];
-									
-									
-								}];
 }
 
 #pragma mark - UITableViewDleegate methods
@@ -103,12 +156,12 @@ const NSUInteger ViewControllerScrollViewAtBottomThreshold = 5;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	return _loadedItems.count;
+	return self.loadedItems.count + (self.loading.boolValue ? 1 : 0);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 	UITableViewCell *cell = nil;
-	if (indexPath.row == _loadedItems.count - 1 && _flags.ItemsLoadingTriggered) {
+	if (indexPath.row >= self.loadedItems.count && self.loading.boolValue) {
 		cell = [tableView dequeueReusableCellWithIdentifier:@"activity" forIndexPath:indexPath];
 		// Weird UIKit behavior workaround. Although I set in IB for this activity indicator to always
 		// animate, after being removed and re-added to table view is stops animating.
@@ -121,7 +174,7 @@ const NSUInteger ViewControllerScrollViewAtBottomThreshold = 5;
 	}
 	else {
 		cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
-		cell.textLabel.text = _loadedItems[indexPath.row];
+		cell.textLabel.text = self.loadedItems[indexPath.row];
 	}
 	
 	return cell;
@@ -131,9 +184,8 @@ const NSUInteger ViewControllerScrollViewAtBottomThreshold = 5;
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
 	if (scrollView.contentOffset.y >
-		(scrollView.contentSize.height - scrollView.bounds.size.height) - ViewControllerScrollViewAtBottomThreshold &&
-		!_flags.ItemsLoadingTriggered) {
-		[self _loadNextPage];
+		(scrollView.contentSize.height - scrollView.bounds.size.height) - ViewControllerScrollViewAtBottomThreshold) {
+		[_loadNextPageCommand execute:@(self.loadedItems.count / ViewControllerProductsPageSize)];
 	}
 }
 @end
